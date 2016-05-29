@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from threatcrowd import domain_report
 import zmq
 import json
+import requests
 
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
@@ -18,6 +18,7 @@ try:
         data = json.loads(data)
         domain = data["query"][:-1]
         print "Report: {0}".format(domain)
-        print domain_report(domain)
+        threat_req = requests.get("http://10.0.42.7:8888/domain/{0}/".format(domain))
+        print json.loads(threat_req.text)
 except KeyboardInterrupt:
     running = False
