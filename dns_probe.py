@@ -6,6 +6,14 @@ import time
 import json
 from scapy.all import *
 
+def expand(p):
+    yield p.name
+    while p.payload:
+       p = p.payload
+       yield p.name
+
+
+
 class DnsProbe(object):
 
     def __init__(self, socket):
@@ -19,16 +27,28 @@ class DnsProbe(object):
 
     def check_packet(self, pkt):
 
-        src_ip = pkt[IP].src
-        query = pkt[DNS].qd.qname
-        captured = time.time()
-        data = {"src_ip":src_ip,
-                "query":query,
-                "timestamp":captured}
+        try:
+            src_ip = None
+            dst_ip = None
+            if IP in pkt:
+                src_ip = pkt[IP].src
+                dst_ip = pkt[IP].dst
+            else:
+                src_ip = pkt[IPv6].src
+                dst_ip = pkt[IPv6].dst
+            query = pkt[DNS].qd.qname
+            captured = time.time()
+            data = {"src_ip":src_ip,
+                    "dst_ip":dst_ip,
+                    "query":query,
+                    "timestamp":captured}
 
-        output = json.dumps(data)
-        print output
-        self.socket.send("dns " + output)
+            output = json.dumps(data)
+            print output
+            self.socket.send("dns " + output)
+        except Exception as e:
+            print e
+            print list(expand(pkt))
 
 def main(interface, port):
     print "Starting capture on {0}".format(interface)
