@@ -74,8 +74,10 @@ def main(interface, port):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Script to analyze incoming DNS traffic")
-    parser.add_argument("-i", "--interface", default="eth0", help="Interface to use")
-    parser.add_argument("-p", "--port", default=7777, type=int, help="port to bind")
+    parser.add_argument("-i", "--interface", default="eth0",
+        help="Interface to use, default eth0")
+    parser.add_argument("-p", "--port", default=7777, type=int,
+        help="port to bind, default 7777")
 
     args = parser.parse_args()
 
