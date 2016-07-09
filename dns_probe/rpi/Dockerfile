@@ -1,8 +1,6 @@
 FROM resin/rpi-raspbian
 RUN apt-get update
 RUN apt-get -y install python tcpdump python-zmq python-scapy
-RUN pip install --upgrade pip
-RUN pip install scapy
 COPY ../src /app
 
 ENV IFACE eth0
