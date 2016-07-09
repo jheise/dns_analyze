@@ -1,6 +1,6 @@
 FROM resin/rpi-raspbian
 RUN apt-get update
-RUN apt-get -y install python python-pip python-dev tcpdump
+RUN apt-get -y install python python-pip python-dev tcpdump gcc
 RUN pip install --upgrade pip
 RUN pip install scapy pyzmq
 COPY ../src /app

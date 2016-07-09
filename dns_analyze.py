@@ -3,16 +3,16 @@
 import argparse
 from scapy.all import *
 
-known_dns = []
+#known_dns = []
 
 def check_packet(pkt):
     global known_dns
 
     src_ip = pkt[IP].src
     query = pkt[DNS].qd.qname
-    if query not in known_dns:
-        known_dns.append(query)
-        print "Src: {0} Query: {1}".format(src_ip, query)
+    #if query not in known_dns:
+        #known_dns.append(query)
+    print "Src: {0} Query: {1}".format(src_ip, query)
 
 def main(interface):
     print "Starting capture on {0}".format(interface)
