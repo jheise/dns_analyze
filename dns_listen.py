@@ -18,17 +18,7 @@ def main(zmq_host, zmq_topic):
             topic, data = msg.split(" ", 1)
             data = json.loads(data)
 
-            output = {}
-            output["version"] = "1.1"
-            output["host"] = "dns_scan"
-            output["short_message"] = "dns_scan"
-            output["timestamp"] = data["timestamp"]
-            output["level"] = 1
-            output["_src_ip"] = data["src_ip"]
-            output["_dst_ip"] = data["dst_ip"]
-            output["_query"] = data["query"]
-
-            print output
+            print data
 
     except KeyboardInterrupt:
         running = False

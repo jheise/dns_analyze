@@ -1,0 +1,11 @@
+FROM resin/rpi-raspbian
+RUN apt-get update
+RUN apt-get -y install python python-zmq
+COPY src /app
+
+ENV SIP    10.0.0.1
+ENV SPORT  7777
+ENV PORT   7777
+
+EXPOSE ${PORT}
+CMD /usr/bin/python /app/dns_threat.py --source_ip ${SIP} --source_port ${SPORT} --port ${PORT}

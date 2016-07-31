@@ -23,11 +23,14 @@ def main(zmq_host, zmq_topic, gelf_host, hostname):
             output["version"] = "1.1"
             output["host"] = hostname
             output["short_message"] = "dns_scan"
-            output["timestamp"] = data["timestamp"]
+            output["timestamp"] = data["Timestamp"]
             output["level"] = 1
-            output["_src_ip"] = data["src_ip"]
-            output["_dst_ip"] = data["dst_ip"]
-            output["_query"] = data["query"]
+            output["_src_ip"] = data["SrcIP"]
+            output["_dst_ip"] = data["DstIP"]
+            output["_query"] = data["Query"]
+
+            if "new_domain" in data:
+                output["_new_domain"] = data["new_domain"]
 
             print output
             r = requests.post(gelf_host, data=json.dumps(output))
