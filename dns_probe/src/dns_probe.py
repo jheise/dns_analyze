@@ -38,10 +38,10 @@ class DnsProbe(object):
                 dst_ip = pkt[IPv6].dst
             query = pkt[DNS].qd.qname
             captured = time.time()
-            data = {"src_ip":src_ip,
-                    "dst_ip":dst_ip,
-                    "query":query,
-                    "timestamp":captured}
+            data = {"SrcIP":src_ip,
+                    "DstIP":dst_ip,
+                    "Query":query,
+                    "Timestamp":captured}
 
             output = json.dumps(data)
             print output

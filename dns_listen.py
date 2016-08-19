@@ -25,7 +25,7 @@ def main(zmq_host, zmq_topic):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Consume json from zmq and display data")
-    parser.add_argument("-z", "--zmq", required=True, help="ZMQ connection eg: tcp://10.0.0.1:7777")
+    parser.add_argument("-z", "--zmq", default="tcp://localhost:7777", help="ZMQ connection eg: tcp://localhost:7777")
     parser.add_argument("-t", "--topic", default="dns", help="ZMQ topic, default dns")
 
     args = parser.parse_args()

@@ -56,7 +56,7 @@ def main(zmq_host, zmq_topic, port, domains):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Script to analyze incoming DNS traffic")
-    parser.add_argument("-zh", "--zmq-host", default="localhost:7777", help="host running zmq dns stream, default localhost:7777")
+    parser.add_argument("-zh", "--zmq-host", default="tcp://localhost:7777", help="host running zmq dns stream, default tcp://localhost:7777")
     parser.add_argument("-zt", "--zmq-topic", default="dns", help="zmq topic to listen for")
     parser.add_argument("-p", "--port", default=8888, type=int,
         help="port to bind, default 8888")

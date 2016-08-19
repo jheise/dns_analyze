@@ -6,7 +6,7 @@ import requests
 
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
-socket.connect("tcp://10.0.42.7:7777")
+socket.connect("tcp://localhost:7777")
 socket.setsockopt(zmq.SUBSCRIBE, "dns")
 
 running = True
@@ -16,9 +16,11 @@ try:
         msg = socket.recv()
         topic, data = msg.split(" ", 1)
         data = json.loads(data)
-        domain = data["query"][:-1]
+        domain = data["Query"]
         print "Report: {0}".format(domain)
-        threat_req = requests.get("http://10.0.42.7:8888/domain/{0}/".format(domain))
-        print json.loads(threat_req.text)
+        threat_req = requests.get("http://localhost:9999/domain/{0}/".format(domain))
+        threat_data = json.loads(threat_req.text)
+        print threat_data["hashes"]
+        print threat_data["permalink"]
 except KeyboardInterrupt:
     running = False
