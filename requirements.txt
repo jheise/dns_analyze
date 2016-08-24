@@ -1,5 +1,8 @@
+-e git+https://github.com/jheise/datastream@38c8f172e38a7ed80f1daa4e233ee01cfe98873f#egg=datastream-master
 elasticsearch==2.2.0
 pyzmq==15.2.0
+requests==2.9.1
 scapy==2.3.2
+threatcrowd==0.4
 urllib3==1.14
 wheel==0.29.0
