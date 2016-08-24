@@ -1,47 +1,46 @@
 #!/usr/bin/env python
 
-import zmq
+import argparse
+import datastream.reporter
 import json
 import requests
-import argparse
 
 default_keys = set(["Timestamp","SrcIP","DstIP","Query"])
 
-def main(zmq_host, zmq_topic, gelf_host, hostname):
-    context = zmq.Context()
-    socket = context.socket(zmq.SUB)
-    socket.connect(zmq_host)
-    socket.setsockopt(zmq.SUBSCRIBE, zmq_topic)
+class GelfReporter(datastream.reporter.Reporter):
+    def __init__(self, zmq_host, zmq_topic, gelf_host, hostname):
+        super(GelfReporter,self).__init__(zmq_host, zmq_topic)
+        self.gelf_host = gelf_host
+        self.hostname = hostname
 
+    def _report(self, data):
+        output = {}
+        output["version"] = "1.1"
+        output["host"] = self.hostname
+        output["short_message"] = "dns_scan"
+        output["timestamp"] = data["Timestamp"]
+        output["level"] = 1
+        output["_src_ip"] = data["SrcIP"]
+        output["_dst_ip"] = data["DstIP"]
+        output["_query"] = data["Query"]
+
+        # all standard keys taken care of, deal with any new keys
+        for key in data.keys():
+            if key not in default_keys:
+                new_key = "_{0}".format(key.lower())
+                output[new_key] = data[key]
+
+        print output
+        r = requests.post(self.gelf_host, data=json.dumps(output))
+
+def main(zmq_host, zmq_topic, gelf_host, hostname):
+    gelf_reporter = GelfReporter(zmq_host, zmq_topic, gelf_host, hostname)
+    gelf_reporter.activate()
     running = True
 
     try:
         while running:
-            msg = socket.recv()
-            topic, data = msg.split(" ", 1)
-            data = json.loads(data)
-
-            output = {}
-            output["version"] = "1.1"
-            output["host"] = hostname
-            output["short_message"] = "dns_scan"
-            output["timestamp"] = data["Timestamp"]
-            output["level"] = 1
-            output["_src_ip"] = data["SrcIP"]
-            output["_dst_ip"] = data["DstIP"]
-            output["_query"] = data["Query"]
-
-            # all standard keys taken care of, deal with any new keys
-            for key in data.keys():
-                if key not in default_keys:
-                    new_key = "_{0}".format(key.lower())
-                    output[new_key] = data[key]
-
-            #if "new_domain" in data:
-                #output["_new_domain"] = data["new_domain"]
-
-            print output
-            r = requests.post(gelf_host, data=json.dumps(output))
+            gelf_reporter.process()
 
     except KeyboardInterrupt:
         running = False
