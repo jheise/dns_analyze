@@ -1,6 +1,5 @@
 cffi==1.7.0
 cryptography==1.5
--e git+https://github.com/jheise/datastream@38c8f172e38a7ed80f1daa4e233ee01cfe98873f#egg=datastream
 elasticsearch==2.2.0
 enum34==1.1.6
 idna==2.1
