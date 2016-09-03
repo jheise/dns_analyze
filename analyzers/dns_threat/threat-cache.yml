@@ -1,0 +1,8 @@
+redis:
+  image: "redis"
+threatcache:
+  image: "jheise/threatcache"
+  links:
+    - redis:redis
+  ports:
+    - "9999:8888"
