@@ -1,52 +1,40 @@
 #!/usr/bin/env python
 
 import argparse
-import json
-import zmq
+import datastream.analyzer
 import requests
+import json
+
+class ThreatAnalyzer(datastream.analyzer.Analyzer):
+
+    def _analyze(self, data):
+        query = data["Query"]
+        resp = requests.get("http://localhost:9999/domain/{0}/".format(query))
+        try:
+            threat_data = json.loads(resp.text)
+            if "permalink" in threat_data:
+                data["permalink"] = threat_data["permalink"]
+            if "hashes" in threat_data:
+                hashes = threat_data["hashes"]
+                hashes_str = ",".join(hashes)
+                data["hashes"] = hashes_str
+        except Exception as e:
+            print "Error with {0}".format(query)
+            print e
+        return data
 
 
 def main(zmq_host, zmq_topic, port):
 
-    # setup the zmq pub socket
-    context = zmq.Context()
-    socket = context.socket(zmq.PUB)
-    socket.bind("tcp://*:{0}".format(port))
-
-    # setup the zmq sub socket
-    scontext = zmq.Context()
-    ssocket = scontext.socket(zmq.SUB)
-    ssocket.connect(zmq_host)
-    ssocket.setsockopt(zmq.SUBSCRIBE, zmq_topic)
-
+    threatanalyzer = ThreatAnalyzer(zmq_host, zmq_topic, port)
+    threatanalyzer.activate()
     running = True
 
     try:
         while running:
-            msg = ssocket.recv()
-            topic, data = msg.split(" ", 1)
-            data = json.loads(data)
-
-            # check if this is a query for a new domain
-            query = data["Query"]
-            print "Checking {0}".format(query)
-            resp = requests.get("http://localhost:9999/domain/{0}/".format(query))
-            try:
-                threat_data = json.loads(resp.text)
-                if "permalink" in threat_data:
-                    data["permalink"] = threat_data["permalink"]
-                if "hashes" in threat_data:
-                    hashes = threat_data["hashes"]
-                    hashes_str = ",".join(hashes)
-                    data["hashes"] = hashes_str
-            except Exception:
-                print "Error with {0}".format(query)
-    
-            # repackage data and deploy
-            socket.send(zmq_topic + " " + json.dumps(data))
-
-    except Exception as e:
-        print e
+            threatanalyzer.process()
+    except KeyboardInterrupt:
+        running = False
 
 if __name__ == "__main__":
 

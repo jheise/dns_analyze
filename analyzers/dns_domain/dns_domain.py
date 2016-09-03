@@ -1,46 +1,31 @@
 #!/usr/bin/env python
 
 import argparse
-import csv
-import json
-import zmq
+import datastream.analyzer
 
+class DomainAnalyzer(datastream.analyzer.Analyzer):
+
+    def _analyze(self, data):
+        # check if this is a query for a new domain
+        query = data["Query"].split(".")
+        domain = ".".join(query[-2:])
+        subdomain = ".".join(query[:-2])
+        data["Domain"] = domain
+        data["Subdomain"] = subdomain
+
+        return data
 
 def main(zmq_host, zmq_topic, port):
 
-    # setup the zmq pub socket
-    context = zmq.Context()
-    socket = context.socket(zmq.PUB)
-    socket.bind("tcp://*:{0}".format(port))
-
-    # setup the zmq sub socket
-    scontext = zmq.Context()
-    ssocket = scontext.socket(zmq.SUB)
-    ssocket.connect(zmq_host)
-    ssocket.setsockopt(zmq.SUBSCRIBE, zmq_topic)
-
+    domainanalyzer = DomainAnalyzer(zmq_host, zmq_topic, port)
+    domainanalyzer.activate()
     running = True
 
     try:
         while running:
-            msg = ssocket.recv()
-            topic, data = msg.split(" ", 1)
-            data = json.loads(data)
-
-            # check if this is a query for a new domain
-            query = data["Query"].split(".")
-            domain = ".".join(query[-2:])
-            subdomain = ".".join(query[:-2])
-            data["Domain"] = domain
-            data["Subdomain"] = subdomain
-
-            print data
-
-            # repackage data and deploy
-            socket.send(zmq_topic + " " + json.dumps(data))
-
-    except Exception as e:
-        print e
+            domainanalyzer.process()
+    except KeyboardInterrupt:
+        running = False
 
 if __name__ == "__main__":
 
