@@ -8,7 +8,13 @@ class NewDomainAnalyzer(datastream.analyzer.Analyzer):
 
     def __init__(self, zmq_host, zmq_topic, port, domains):
         super(NewDomainAnalyzer, self).__init__(zmq_host, zmq_topic, port)
-        self.domains = domains
+        domain_list = []
+        with open(domains) as fh:
+            data = csv.DictReader(fh)
+            for line in data:
+                domain_list.append(line["Domain"])
+
+        self.domains = set(domain_list)
 
     def _analyzer(self, data):
         query = data["Query"].split(".")
@@ -22,42 +28,16 @@ class NewDomainAnalyzer(datastream.analyzer.Analyzer):
 
 def main(zmq_host, zmq_topic, port, domains):
 
-    # setup the zmq pub socket
-    context = zmq.Context()
-    socket = context.socket(zmq.PUB)
-    socket.bind("tcp://*:{0}".format(port))
-
-    # setup the zmq sub socket
-    scontext = zmq.Context()
-    ssocket = scontext.socket(zmq.SUB)
-    ssocket.connect(zmq_host)
-    ssocket.setsockopt(zmq.SUBSCRIBE, zmq_topic)
-
-    # read new domains into set
-
-    domain_list = []
-    with open(domains) as fh:
-        data = csv.DictReader(fh)
-        for line in data:
-            domain_list.append(line["Domain"])
-
-    domain_list = set(domain_list)
+    domain_analyzer = NewDomainAnalyzer(zmq_host, zmq_topic, port, domains)
+    domain_analyzer.activate()
 
     running = True
 
     try:
         while running:
-            msg = ssocket.recv()
-            topic, data = msg.split(" ", 1)
-            data = json.loads(data)
-
-            # check if this is a query for a new domain
-
-            # repackage data and deploy
-            socket.send(zmq_topic + " " + json.dumps(data))
-
-    except Exception as e:
-        print e
+            domain_analyzer.process()
+    except KeyboardInterrupt:
+        running = False
 
 if __name__ == "__main__":
 
