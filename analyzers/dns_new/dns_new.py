@@ -2,8 +2,22 @@
 
 import argparse
 import csv
-import json
-import zmq
+import datastream.analyzer
+
+class NewDomainAnalyzer(datastream.analyzer.Analyzer):
+
+    def __init__(self, zmq_host, zmq_topic, port, domains):
+        super(NewDomainAnalyzer, self).__init__(zmq_host, zmq_topic, port)
+        self.domains = domains
+
+    def _analyzer(self, data):
+        query = data["Query"].split(".")
+        if len(query) >= 2:
+            domain = ".".join(query[-2:])
+            if domain in domain_list:
+                data["new_domain"] = "true"
+
+        return data
 
 
 def main(zmq_host, zmq_topic, port, domains):
@@ -38,14 +52,6 @@ def main(zmq_host, zmq_topic, port, domains):
             data = json.loads(data)
 
             # check if this is a query for a new domain
-            query = data["Query"].split(".")
-            print "Checking {0}".format(query)
-            if len(query) >= 2:
-                domain = ".".join(query[-2:])
-                print "Checking {0}".format(domain)
-                if domain in domain_list:
-                    print "New domain {0}".format(domain)
-                    data["new_domain"] = "true"
 
             # repackage data and deploy
             socket.send(zmq_topic + " " + json.dumps(data))
