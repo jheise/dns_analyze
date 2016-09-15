@@ -3,8 +3,10 @@ cryptography==1.5
 -e git+https://github.com/jheise/datastream@a27f16bbab80b8c7869ab1e456c5843f0fea9510#egg=datastream
 elasticsearch==2.2.0
 enum34==1.1.6
+geoip2==2.4.0
 idna==2.1
 ipaddress==1.0.16
+maxminddb==1.2.1
 ndg-httpsclient==0.4.2
 pyasn1==0.1.9
 pycparser==2.14
