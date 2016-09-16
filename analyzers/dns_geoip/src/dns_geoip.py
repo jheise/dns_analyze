@@ -18,6 +18,8 @@ class DomainAnalyzer(datastream.analyzer.Analyzer):
                         response = self.database.city(answer)
                         geolocation = "{0},{1}".format(response.location.latitude, response.location.longitude)
                         data["query_geolocation"] = geolocation
+                        data["query_country"] = response.country.name
+                        data["query_city"] = response.city.name
         except Exception as e:
             print e
             #pass
