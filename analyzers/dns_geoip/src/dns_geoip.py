@@ -12,14 +12,13 @@ class DomainAnalyzer(datastream.analyzer.Analyzer):
     def _analyze(self, data):
         # check if this is a query for a new domain
         try:
-            if data["Answers"]:
-                for answer in data["Answers"]:
-                    if not "query_geolocation" in data:
-                        response = self.database.city(answer)
-                        geolocation = "{0},{1}".format(response.location.latitude, response.location.longitude)
-                        data["query_geolocation"] = geolocation
-                        data["query_country"] = response.country.name
-                        data["query_city"] = response.city.name
+            if "Answer" in data:
+                if data["Type"] == "A" or data["Type"] == "AAAA":
+                    response = self.database.city(data["Answer"])
+                    geolocation = "{0},{1}".format(response.location.latitude, response.location.longitude)
+                    data["query_geolocation"] = geolocation
+                    data["query_country"] = response.country.name
+                    data["query_city"] = response.city.name
         except Exception as e:
             print e
             #pass
