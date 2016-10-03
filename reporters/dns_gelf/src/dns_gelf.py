@@ -5,7 +5,7 @@ import datastream.reporter
 import json
 import requests
 
-default_keys = set(["Timestamp","SrcIP","DstIP","Query"])
+default_keys = set(["Timestamp","SrcIP","DstIP"])
 
 class GelfReporter(datastream.reporter.Reporter):
     def __init__(self, zmq_host, zmq_topic, gelf_host, hostname):
