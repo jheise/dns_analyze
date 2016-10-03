@@ -22,7 +22,6 @@ class GelfReporter(datastream.reporter.Reporter):
         output["level"] = 1
         output["_src_ip"] = data["SrcIP"]
         output["_dst_ip"] = data["DstIP"]
-        output["_query"] = data["Query"]
 
         # all standard keys taken care of, deal with any new keys
         for key in data.keys():
