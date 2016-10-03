@@ -7,11 +7,12 @@ class DomainAnalyzer(datastream.analyzer.Analyzer):
 
     def _analyze(self, data):
         # check if this is a query for a new domain
-        query = data["Query"].split(".")
-        domain = ".".join(query[-2:])
-        subdomain = ".".join(query[:-2])
-        data["Domain"] = domain
-        data["Subdomain"] = subdomain
+        if "Query" in data:
+            query = data["Query"].split(".")
+            domain = ".".join(query[-2:])
+            subdomain = ".".join(query[:-2])
+            data["Domain"] = domain
+            data["Subdomain"] = subdomain
 
         return data
 
