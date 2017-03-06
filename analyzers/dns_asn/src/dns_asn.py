@@ -2,8 +2,8 @@
 
 import argparse
 import datastream.analyzer
-from ipwhois import Net
-from ipwhois import IPASN
+from ipwhois.net import Net
+from ipwhois.asn import IPASN
 
 class ASNAnalyzer(datastream.analyzer.Analyzer):
 
