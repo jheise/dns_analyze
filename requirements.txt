@@ -13,7 +13,7 @@ pycparser==2.14
 pyOpenSSL==16.1.0
 pyzmq==15.2.0
 requests==2.9.1
-scapy==2.3.2
+scapy==2.4.1
 six==1.10.0
 threatcrowd==0.4
 urllib3==1.14
