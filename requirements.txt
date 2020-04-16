@@ -10,7 +10,7 @@ maxminddb==1.2.1
 ndg-httpsclient==0.4.2
 pyasn1==0.1.9
 pycparser==2.14
-pyOpenSSL==16.1.0
+pyOpenSSL==17.5.0
 pyzmq==15.2.0
 requests==2.9.1
 scapy==2.3.2
